@@ -30,6 +30,16 @@ const App: Component = () => {
     setTaskList(newTaskList);
   }
 
+  const toggleStatus = (taskId: string) => {
+    const newTaskList = taskList().map((task) => {
+      if (task.id === taskId) {
+        return { ...task, completed: !task.completed };
+      }
+      return task;
+    });
+    setTaskList(newTaskList);
+  }
+
   return (
     <div class="container mt-5 text-center">
       <h1 class="mb-4">Whattodo!</h1>
@@ -47,8 +57,16 @@ const App: Component = () => {
           {(task: Task) => (
             <div class="row row-cols-3 mb-3 justify-content-center">
               <button class="btn btn-danger w-auto" onClick={() => deleteTask(task.id)}>X</button>
-              <div class="bg-light p-2 mx-2">{task.text}</div>
-              <input type="checkbox" checked={task.completed} role="button" class="form-check-input h-auto px-3" />
+              <div class={`bg-light p-2 mx-2 ${task.completed && 'text-decoration-line-through text-success'}`}>
+                {task.text}
+              </div>
+              <input
+                type="checkbox"
+                checked={task.completed}
+                role="button"
+                class="form-check-input h-auto px-3"
+                onClick={() => toggleStatus(task.id)}
+              />
             </div>
           )}
         </For>
