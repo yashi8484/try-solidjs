@@ -1,4 +1,5 @@
-import { Component, createSignal, For } from 'solid-js';
+import { Component, For } from 'solid-js';
+import { createStore } from 'solid-js/store';
 
 const App: Component = () => {
   type Task = {
@@ -7,7 +8,7 @@ const App: Component = () => {
     completed: boolean;
   }
 
-  const [taskList, setTaskList] = createSignal([] as Task[]);
+  const [taskList, setTaskList] = createStore([] as Task[]);
 
   const addTask = (e: Event) => {
     // prevent the default reload behavior when we submit our form.
@@ -21,23 +22,21 @@ const App: Component = () => {
       completed: false,
     }
 
-    setTaskList([newTask, ...taskList()]);
+    setTaskList([newTask, ...taskList]);
     taskInput.value = '';
   }
 
   const deleteTask = (taskId: string) => {
-    const newTaskList = taskList().filter((task) => task.id !== taskId);
+    const newTaskList = taskList.filter((task) => task.id !== taskId);
     setTaskList(newTaskList);
   }
 
   const toggleStatus = (taskId: string) => {
-    const newTaskList = taskList().map((task) => {
-      if (task.id === taskId) {
-        return { ...task, completed: !task.completed };
-      }
-      return task;
-    });
-    setTaskList(newTaskList);
+    setTaskList(
+      (task) => task.id === taskId,
+      'completed',
+      (completed) => !completed,
+    )
   }
 
   return (
@@ -53,7 +52,7 @@ const App: Component = () => {
       </form>
       <div>
         <h4 class="text-muted mb-4">Tasks</h4>
-        <For each={taskList()}>
+        <For each={taskList}>
           {(task: Task) => (
             <div class="row row-cols-3 mb-3 justify-content-center">
               <button class="btn btn-danger w-auto" onClick={() => deleteTask(task.id)}>X</button>
